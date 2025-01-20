@@ -81,6 +81,36 @@
 - During an upgrade on **April 21, 2022**, a new version of the `Replica` contract was deployed. However, during the deployment, the contract's `_committedRoot` variable was set to `0x00` (the zero hash). 
 - The `Replica` contract uses the `_committedRoot` to determine the validity of incoming cross-chain messages. This hash acts as a reference point for verifying whether a given message root is authorized for processing.
 - By setting `_committedRoot` to `0x00`, the `confirmAt` mapping in the contract was updated such that the zero hash (`0x00`) was considered a valid and trusted root.
+```
+/**
+     * @notice Initialize the replica
+     * @dev Performs the following action:
+     *      - initializes inherited contracts
+     *      - initializes re-entrancy guard
+     *      - sets remote domain
+     *      - sets a trusted root, and pre-approves messages under it
+     *      - sets the optimistic timer
+     * @param _remoteDomain The domain of the Home contract this follows
+     * @param _updater The EVM id of the updater
+     * @param _committedRoot A trusted root from which to start the Replica
+     * @param _optimisticSeconds The time a new root must wait to be confirmed
+     */
+    function initialize(
+        uint32 _remoteDomain,
+        address _updater,
+        bytes32 _committedRoot,
+        uint256 _optimisticSeconds
+    ) public initializer {
+        __NomadBase_initialize(_updater);
+        // set storage variables
+        entered = 1;
+        remoteDomain = _remoteDomain;
+        committedRoot = _committedRoot;
+        // pre-approve the committed root.
+        if (_committedRoot != bytes32(0)) confirmAt[_committedRoot] = 1;
+        _setOptimisticTimeout(_optimisticSeconds);
+    }
+```
 
 #### **Impact of the Initialization Flaw**
 - The mapping `confirmAt[0x00]` was assigned a timestamp of `1`, which allowed any message with a root of `0x00` to bypass normal authentication and validation checks.
@@ -92,6 +122,46 @@
 
 - The `Replica` contract is responsible for authenticating messages sent across chains. This is achieved through the `process()` function, which checks if the root of a given message is part of the `confirmAt` mapping.
 - Normally, this mapping would only include trusted roots that had been validated through a rigorous process. However, due to the initialization flaw, the zero hash (`0x00`) was already included in the mapping with an early timestamp (`1`), meaning it was always valid.
+
+
+```
+/**
+     * @notice Given formatted message, attempts to dispatch
+     * message payload to end recipient.
+     * @dev Recipient must implement a `handle` method (refer to IMessageRecipient.sol)
+     * Reverts if formatted message's destination domain is not the Replica's domain,
+     * if message has not been proven,
+     * or if not enough gas is provided for the dispatch transaction.
+     * @param _message Formatted message
+     * @return _success TRUE iff dispatch transaction succeeded
+     */
+    function process(bytes memory _message) public returns (bool _success) {
+        // ensure message was meant for this domain
+        bytes29 _m = _message.ref(0);
+        require(_m.destination() == localDomain, "!destination");
+        // ensure message has been proven
+        bytes32 _messageHash = _m.keccak();
+        require(acceptableRoot(messages[_messageHash]), "!proven");
+        // check re-entrancy guard
+        require(entered == 1, "!reentrant");
+        entered = 0;
+        // update message status as processed
+        messages[_messageHash] = LEGACY_STATUS_PROCESSED;
+        // call handle function
+        IMessageRecipient(_m.recipientAddress()).handle(
+            _m.origin(),
+            _m.nonce(),
+            _m.sender(),
+            _m.body().clone()
+        );
+        // emit process results
+        emit Process(_messageHash, true, "");
+        // reset re-entrancy guard
+        entered = 1;
+        // return true
+        return true;
+    }
+```
 
 #### **The Exploit Mechanism**
 - Attackers identified this flaw and began crafting messages with the root value set to `0x00`.
@@ -106,6 +176,7 @@
 - Unlike sophisticated attacks that require significant technical expertise, this exploit could be carried out by copying and pasting the original attacker's transaction data and replacing the target addresses.
 - This “free-for-all” nature of the exploit led to the rapid draining of funds, with over $190 million stolen within hours.
 
+[Attack Transaction in Tenderly](https://dashboard.tenderly.co/tx/mainnet/0xa5fe9d044e4f3e5aa5bc4c0709333cd2190cba0f4e7f16bcf73f49f83e4a5460)
 ---
 
 ## Conclusion
