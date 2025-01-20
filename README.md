@@ -23,3 +23,8 @@
 - It uses "home" and "replica" contracts:
   - **Home Contract**: Deployed on the source chain, managing the submission of cross-chain messages.
   - **Replica Contract**: Deployed on the destination chain, responsible for processing messages.
+
+### Tech 
+- The protocol comprises on-chain smart contracts and off-chain agents:
+  - On-chain contracts implement Nomad's messaging API, enabling message queuing and state replication across different chains.
+  - Off-chain agents secure and relay state across chains, forming the backbone of the messaging layer. :contentReference[oaicite:2]{index=2}
