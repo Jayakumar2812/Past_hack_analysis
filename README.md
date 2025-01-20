@@ -27,4 +27,4 @@
 ### Tech 
 - The protocol comprises on-chain smart contracts and off-chain agents:
   - On-chain contracts implement Nomad's messaging API, enabling message queuing and state replication across different chains.
-  - Off-chain agents secure and relay state across chains, forming the backbone of the messaging layer. :contentReference[oaicite:2]{index=2}
+  - Off-chain agents secure and relay state across chains, forming the backbone of the messaging layer.
