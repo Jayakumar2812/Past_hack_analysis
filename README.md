@@ -179,15 +179,19 @@
 [Attack Transaction in Tenderly](https://dashboard.tenderly.co/tx/mainnet/0xa5fe9d044e4f3e5aa5bc4c0709333cd2190cba0f4e7f16bcf73f49f83e4a5460)
 ---
 
-## Conclusion
+## Recommendations to Prevent Nomad Hacks
 
-The Nomad Bridge hack was a direct result of a **misconfiguration during initialization** and the lack of robust safeguards in the `Replica` contract. Specifically:
-1. The `_committedRoot` being set to `0x00` allowed the zero hash to bypass authentication checks.
-2. The `confirmAt` mapping, improperly initialized, allowed attackers to exploit the system by submitting unauthorized messages with the zero root.
+1. **Strengthen Optimistic Verification**:
+   - Add stricter validation during the challenge period to detect and reject fraudulent messages proactively.
+   - Implement cryptographic signatures on message roots to ensure they cannot be forged or tampered with.
 
-This incident highlights the importance of:
-- **Rigorous testing and validation** during smart contract deployments and upgrades.
-- Ensuring initialization logic does not inadvertently introduce vulnerabilities.
-- Implementing fallback mechanisms to pause or mitigate damage when critical issues arise.
+2. **Improve Contract Initialization**:
+   - Ensure critical variables like `_committedRoot` are set correctly during deployment to prevent trust bypass vulnerabilities.
 
-The hack is a stark reminder of how even small oversights in contract initialization can lead to catastrophic consequences in decentralized systems.
+3. **Enhance Safeguards**:
+   - Add fallback mechanisms to pause operations during anomalies.
+
+4. **Conduct Regular Audits and Fuzzing**:
+   - Perform detailed audits after every deployment or upgrade.
+   - Use fuzz testing to identify unexpected edge cases and vulnerabilities.
+
