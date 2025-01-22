@@ -84,9 +84,8 @@
 - The **health score** determines how close a borrower is to liquidation:
   
   
-  \[
-  \text{Health Score} = \frac{\text{Max LTV}}{\text{Current LTV}}
-  \]
+  **Health Score = Max LTV / Current LTV**
+
 
 - Euler's Maximum LTV values:
   - **Regular Loans**: 75% (collateral token and loaned token are distinct).
