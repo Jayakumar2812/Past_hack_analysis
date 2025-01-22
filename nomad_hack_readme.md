@@ -195,3 +195,8 @@
    - Perform detailed audits after every deployment or upgrade.
    - Use fuzz testing to identify unexpected edge cases and vulnerabilities.
 
+
+## run POC for nomad hack 
+   ```
+      forge test --match-path test/nomad_attacker.t.sol
+   ```

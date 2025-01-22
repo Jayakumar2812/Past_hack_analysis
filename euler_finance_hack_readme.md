@@ -301,4 +301,7 @@ This combination of factors enabled the attacker to drain the contract’s funds
 
 
 
-
+## run POC for nomad hack 
+   ```
+      forge test --match-path test/Eulerfinance.sol
+   ```

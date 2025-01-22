@@ -2,18 +2,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-import { Test } from "forge-std/src/Test.sol";
-import { console } from "forge-std/src/console.sol";
+import { Test } from "forge-std/Test.sol";
+import { console } from "forge-std/console.sol";
 import { Violator } from "./Violator.sol";
 import { Liquidator } from "./Liquidator.sol";
-import { IERC20 } from "forge-std/src/interfaces/IERC20.sol";
+import { IERC20 } from "forge-std/interfaces/IERC20.sol";
 import { IEToken } from "./interface/IEToken.sol";
 import { IDToken } from "./interface/IDToken.sol";
 import { IAaveFlashLoan } from "./interface/IAaveFlashLoan.sol";
 import { ILiquidation } from "./interface/ILiquidation.sol";
 import { MarketsView } from "./MarketsView.sol";
 import { IMarkets } from "./interface/IMarkets.sol";
-import { IRiskManager } from "euler-contracts/contracts/IRiskManager.sol";
+import { IRiskManager } from "euler-contracts/IRiskManager.sol";
 
 contract EulerFinancePoC is Test {
     IERC20 constant DAI = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
@@ -31,7 +31,7 @@ contract EulerFinancePoC is Test {
     address person = makeAddr("person"); // random address used when checking liquidation status
 
     function setUp() public {
-        vm.createSelectFork("eth", 16817995);
+        vm.createSelectFork("mainnet", 16817995);
         vm.etch(address(MARKETS_IMPL), address(deployCode('MarketsView.sol')).code);
         vm.label(address(DAI), "DAI");
         vm.label(address(eToken), "eToken");

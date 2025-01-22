@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-import { IERC20 } from "forge-std/src/interfaces/IERC20.sol";
+import { IERC20 } from "forge-std/interfaces/IERC20.sol";
 import { IEToken } from "./interface/IEToken.sol";
 import { IDToken } from "./interface/IDToken.sol";
 import { ILiquidation } from "./interface/ILiquidation.sol";
 import { IMarkets } from "./interface/IMarkets.sol";
 
-import "forge-std/src/Test.sol";
+import "forge-std/Test.sol";
 
 contract Liquidator {
     IERC20 immutable DAI;
