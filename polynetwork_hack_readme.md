@@ -62,9 +62,9 @@ Poly Network facilitates cross-chain asset transfers through a modular framework
 
 ### Steps of the Exploit
 1. **computing the 4byte signature**:
-   - The attacker computed the 32-bit ID for putCurEpochConPubKeyBytes: ethers.utils.id ('putCurEpochConPubKeyBytes(bytes)').slice(0, 10)'0x41973cd9' 
+   - The attacker computed the 32-bit ID for `putCurEpochConPubKeyBytes: ethers.utils.id ('putCurEpochConPubKeyBytes(bytes)').slice(0, 10)'0x41973cd9'` 
    
-   - The function putCurEpochConPubKeyBytes changes the ConKeepersPkBytes variable which contains publickey which has control the over funds of the protocal in that network.
+   - The  `putCurEpochConPubKeyBytes` function changes the ConKeepersPkBytes variable which contains publickey which has control the over funds of the protocal in that network.
    ```
     // Store Consensus book Keepers Public Key Bytes
     function putCurEpochConPubKeyBytes(bytes memory curEpochPkBytes) public whenNotPaused onlyOwner returns (bool) {
@@ -74,7 +74,7 @@ Poly Network facilitates cross-chain asset transfers through a modular framework
    ```
 2. **Brute forcing similar 4byte signature**:
    - The attacker brute-forced a string that, if set as _method in the code snippet above, gives the same 32-bit value. 
-   - In this case the attacker used the string “f1121318093”: ethers.utils.id ('f1121318093(bytes,bytes,uint64)').slice(0, 10)'0x41973cd9' 
+   - In this case the attacker used the string “f1121318093”: `ethers.utils.id ('f1121318093(bytes,bytes,uint64)').slice(0, 10)'0x41973cd9'` 
 
 3. **setting up for cross-chain transaction** :
     - The code  shows that this function is mainly used to help users create makeTxParam and save the hash for future verification. However, it doesn’t restrict the cross-chain operation parameters users provide. 
@@ -130,11 +130,11 @@ Poly Network facilitates cross-chain asset transfers through a modular framework
 4. **Transfer of Funds**:
     - Once the transaction was executed and the attacker was granted the status of Keeper for the Ethereum blockchain, the attacker proceeded into using the corresponding secret key in their possession to funnel tokens out of Poly’s Ethereum wallet into their own wallet. 
     - The attacker repeated the above for other Poly liquidity wallets: Binance, Neo, Tether, etc. 
-    - In the verifyHeaderAndExecuteTx() function,it first deserializes the block header to resolve the specific information that needs to be verified.
-    - The getCurEpochConPubKeyBytes function is then called to get the Keeper public key from the "EthCrossChainData" contract, and the Keeper address is obtained through the deserializeKeepers() function.
-    - Next, the "ECCUtils.verifySig" will be used to verify whether the signature is Keeper or not. From the following code, we can find that the 
-    verifySig() function will cut out the signer’s `v r s`. And get the signer address through the `ecrecover` interface, then call the 
-    containMAddresses() function to compare whether the signer is a Keeper’s or not. 
+    - In the `verifyHeaderAndExecuteTx` function,it first deserializes the block header to resolve the specific information that needs to be verified.
+    - The getCurEpochConPubKeyBytes function is then called to get the Keeper public key from the "EthCrossChainData" contract, and the Keeper address is obtained through the `deserializeKeepers` function.
+    - Next, the `ECCUtils.verifySig` will be used to verify whether the signature is Keeper or not. From the following code, we can find that the 
+    `verifySig` function will cut out the signer’s `v r s`. And get the signer address through the `ecrecover` interface, then call the 
+    `containMAddresses` function to compare whether the signer is a Keeper’s or not. 
     -The check can be passed as long as the number of Keeper signatures meets the requirement, which is `n-(n-1) / 3)` passed in by the ‘EthCrossChainManager’ contract.
     - We can see that the _executeCrossChainTx function does not check the _toContract, _method and other parameters, and directly executes the transaction in the way of _toContract.call.
 
